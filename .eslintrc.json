@@ -16,5 +16,15 @@
     "testing-library",
     "@typescript-eslint",
     "prettier"
-  ]
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "warn",
+      {
+        "trailingComma": "none",
+        "semi": true,
+        "endOfLine": "auto"
+      }
+    ]
+  }
 }

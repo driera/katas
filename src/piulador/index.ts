@@ -1,28 +1,44 @@
 export class Piulador {
-  users: User[];
+  users: Users;
+  timelines: Timelines;
 
   constructor() {
-    this.users = [];
+    this.users = new Users();
+    this.timelines = new Timelines();
   }
 
   register(id: string) {
-    const user = new User(id);
-    this.users.push(user);
+    this.users.add(id);
+    this.timelines.create(id);
   }
 
   writeMessage(id: string, message: string) {
-    const user = this.getUser(id);
-    return user.timeline.add(message);
+    const user = this.users.getUser(id);
+    this.timelines.addMessage(user.id, message);
   }
 
   readTimeline(id: string) {
-    const user = this.getUser(id);
+    const user = this.users.getUser(id);
+    return this.timelines.getMessages(user.id);
+  }
+}
 
-    return user.timeline.getAll();
+type User = {
+  id: string;
+};
+class Users {
+  profiles: User[];
+
+  constructor() {
+    this.profiles = [];
   }
 
-  private getUser(id: string): User {
-    const user = this.users.find((user) => user.id === id);
+  add(id: string) {
+    this.profiles.push({ id });
+  }
+
+  getUser(id: string): User {
+    const user = this.profiles.find((user) => user.id === id);
 
     if (!user) {
       throw new Error(`🚨 User with id "${id}" does not exist!`);
@@ -32,39 +48,33 @@ export class Piulador {
   }
 }
 
-class User {
-  id: string;
-  timeline: Timeline;
-
-  constructor(id: string) {
-    this.id = id;
-    this.timeline = new Timeline();
-  }
-}
-
 type Message = {
   body: string;
   timestamp: number;
 };
 
-class Timeline {
-  messages: Message[];
+class Timelines {
   counter: number;
+  messages: Record<string, Message[]>;
 
   constructor() {
-    this.messages = [];
     this.counter = 0;
+    this.messages = {};
   }
 
-  add(message: string) {
+  create(userId: string) {
+    this.messages[userId] = [];
+  }
+
+  addMessage(userId: string, message: string) {
     this.counter++;
-    this.messages.push({
+    this.messages[userId].push({
       body: message,
       timestamp: this.counter
     });
   }
 
-  getAll() {
-    return this.messages.map((message) => message.body);
+  getMessages(userId: string) {
+    return this.messages[userId].map((message) => message.body);
   }
 }

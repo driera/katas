@@ -23,4 +23,34 @@ describe("Piulador", () => {
       secondMessage
     ]);
   });
+
+  it("allows user to follow someone else", () => {
+    const piulador = new Piulador();
+    piulador.register("Alice");
+    piulador.register("Charlie");
+
+    piulador.followTo("Charlie", "Alice");
+
+    expect(piulador.getFollowers("Alice")).toStrictEqual(["Charlie"]);
+  });
+
+  it("user can read its feed", () => {
+    const piulador = new Piulador();
+    piulador.register("Alice");
+    piulador.register("Bob");
+    piulador.register("Charlie");
+
+    const firstMessage = "piu from Alice!";
+    piulador.writeMessage("Alice", firstMessage);
+    const secondMessage = "a piu from Bob!";
+    piulador.writeMessage("Bob", secondMessage);
+
+    piulador.followTo("Charlie", "Alice");
+    piulador.followTo("Charlie", "Bob");
+
+    expect(piulador.readFeed("Charlie")).toStrictEqual([
+      secondMessage,
+      firstMessage
+    ]);
+  });
 });

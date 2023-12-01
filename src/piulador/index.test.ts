@@ -1,56 +1,39 @@
 import { Piulador } from ".";
 
 describe("Piulador", () => {
-  it("allows registered users to have a timeline", () => {
+  it("allows to login an user", () => {
     const piulador = new Piulador();
+    const userData = { id: "Alice", email: "alice@mail.com" };
+    piulador.register(userData);
 
-    piulador.register("Alice");
+    const alice = piulador.login("Alice");
 
-    expect(piulador.readTimeline("Alice")).toStrictEqual([]);
+    expect(alice.getTimeline()).toStrictEqual([]);
   });
 
-  it("allows to write messages to your timeline", () => {
+  it("user can write a message", () => {
     const piulador = new Piulador();
-    piulador.register("Alice");
+    const userData = { id: "Alice", email: "alice@mail.com" };
+    piulador.register(userData);
 
-    const firstMessage = "My first piu!";
-    piulador.writeMessage("Alice", firstMessage);
-    const secondMessage = "My second piu!";
-    piulador.writeMessage("Alice", secondMessage);
+    const alice = piulador.login("Alice");
+    const message = "My first message!";
+    alice.write(message);
 
-    expect(piulador.readTimeline("Alice")).toStrictEqual([
-      firstMessage,
-      secondMessage
-    ]);
+    expect(alice.getTimeline()).toStrictEqual([message]);
   });
 
-  it("allows user to follow someone else", () => {
+  it("timeline returns most recent messages first", () => {
     const piulador = new Piulador();
-    piulador.register("Alice");
-    piulador.register("Charlie");
+    const userData = { id: "Alice", email: "alice@mail.com" };
+    piulador.register(userData);
 
-    piulador.followTo("Charlie", "Alice");
+    const alice = piulador.login("Alice");
+    const message = "My first message!";
+    alice.write(message);
+    const secondMessage = "My second message!";
+    alice.write(secondMessage);
 
-    expect(piulador.getFollowers("Alice")).toStrictEqual(["Charlie"]);
-  });
-
-  it("user can read its feed", () => {
-    const piulador = new Piulador();
-    piulador.register("Alice");
-    piulador.register("Bob");
-    piulador.register("Charlie");
-
-    const firstMessage = "piu from Alice!";
-    piulador.writeMessage("Alice", firstMessage);
-    const secondMessage = "a piu from Bob!";
-    piulador.writeMessage("Bob", secondMessage);
-
-    piulador.followTo("Charlie", "Alice");
-    piulador.followTo("Charlie", "Bob");
-
-    expect(piulador.readFeed("Charlie")).toStrictEqual([
-      secondMessage,
-      firstMessage
-    ]);
+    expect(alice.getTimeline()).toStrictEqual([secondMessage, message]);
   });
 });
